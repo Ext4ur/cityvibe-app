@@ -10,4 +10,5 @@ interface UserService
      * @return Collection
      */
     public function index(): Collection;
+    
 }

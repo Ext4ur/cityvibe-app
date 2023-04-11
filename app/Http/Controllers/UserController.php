@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTransferObjects\User\StoreUserData;
+use App\Http\Resources\UserCollection;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\Users\UserService;
 use Illuminate\Http\JsonResponse;
@@ -18,9 +21,9 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index()
     {
-        return response()->json($this->userService->index());
+        return new UserCollection($this->userService->index());
     }
 
     /**
@@ -48,12 +51,18 @@ class UserController extends Controller
     public function store(Request $request): JsonResponse
     {
         $user = new User();
-        $user->isbn = $request->isbn;
-        $user->language = $request->language;
         $user->name = $request->name;
-        $user->pages = $request->pages;
+        $user->age = $request->age;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->location = $request->location;
         $user->save();
-        return response()->json($user);
+        return response()->json(
+            new UserResource(
+                $this->userService->create(StoreUserData::from($request)),
+                Response::HTTP_CREATED
+            )
+        );
     }
 
     /**
@@ -64,10 +73,11 @@ class UserController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         $user = User::findOrfail($id);
-        $user->isbn = $request->isbn;
-        $user->language = $request->language;
         $user->name = $request->name;
-        $user->pages = $request->pages;
+        $user->age = $request->age;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->location = $request->location;
         $user->save();
         return response()->json($user);
     }
